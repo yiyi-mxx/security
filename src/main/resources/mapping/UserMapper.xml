@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mxx.security.dao.UserDao">
+    <select id="getUserByUsername"  resultType="com.mxx.security.domain.SysUser">
+        select * from sys_user where username=#{username}
+    </select>
+    <select id="getAllRolePermission" resultType="com.mxx.security.domain.SysRolePermission">
+        SELECT r.id as roleId ,r.name as roleName,p.id as permissionId ,p.url as url
+        FROM sys_role_permission rp,sys_role r,sys_permission p
+        where rp.sys_permission_id=p.id and rp.sys_role_id=r.id
+    </select>
+    <select id="getRoleByUsername" resultType="com.mxx.security.domain.SysRole" parameterType="java.lang.String">
+        select r.id,r.name
+        from sys_role r,sys_user u,sys_user_role ru
+        where ru.sys_role_id=r.id and ru.sys_user_id=u.id and u.username=#{username}
+    </select>
+    <select id="isExist"  resultType="java.lang.Integer">
+        select isnull((select  1 from sys_user where username=#{username}))
+    </select>
+    <insert id="insertUser"  parameterType="com.mxx.security.domain.SysUser">
+<!--        <selectKey keyColumn="id" keyProperty="id" order="AFTER" resultType="java.lang.Integer">-->
+<!--            SELECT LAST_INSERT_ID()-->
+<!--        </selectKey>-->
+        insert into  sys_user (username,password) values(#{username},#{password})
+    </insert>
+    <update id="updatePwd" parameterType="java.lang.String">
+        update sys_user set  password=#{password} where username=#{username}
+    </update>
+    <select id="isAccountLock" resultType="java.lang.Integer" parameterType="java.lang.String">
+        select status from sys_user where username=#{username}
+    </select>
+    <update id="updateUser" parameterType="java.lang.String">
+        update sys_user set status='0' where username=#{username}
+    </update>
+</mapper>
